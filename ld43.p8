@@ -46,6 +46,10 @@ function start_game()
 	floors = generate_floors()
 	current_floor = 1
 	create_player()
+	timer = 60
+	current_time = time()
+	time_left = 60
+	top_y = 118
 end
 
 function generate_floors()
@@ -95,8 +99,8 @@ function sprite(x,y,h,w,s)
 end
 
 function generate_stair()
- local x = flr(rnd(104))+12
- local y = flr(rnd(104))+12
+ local x = flr(rnd(105))+12
+ local y = flr(rnd(105))+12
  local stair = sprite(x,y,8,8,2)
 	stair.d = "⬆️"
  return stair
@@ -114,20 +118,54 @@ end
 function create_player()
 	player = {}
 	player = sprite(56,115,8,8,1)
+ player.step = 1
+ player.f = 1
  player.col = false
 end
 
 function update_game()
 	move_player()
+	//anim_player()
 	col_player()
-
+ if current_time != flr(time()) then
+  current_time = flr(time())
+  time_left = time_left - 1
+  if time_left == 0 then
+  	mode = "gameover"
+  end
+ end
 end
 
 function move_player()
-	if btn(⬅️) then player.x -= 1 end
-	if btn(➡️) then	player.x += 1 end
-	if btn(⬆️) then	player.y -= 1 end
-	if btn(⬇️) then	player.y += 1 end
+	if btn(⬅️) then player.x -= 1 player.d = "⬅️" player.mov = true end
+	if btn(➡️) then	player.x += 1 player.d = "➡️" player.mov = true end
+	if btn(⬆️) then	player.y -= 1 player.d = "⬆️" player.mov = true end
+	if btn(⬇️) then	player.y += 1 player.d = "⬇️" player.mov = true end	
+ if btn(⬆️) == false and btn(⬇️) == false and btn(➡️) == false and btn(⬅️) == false then
+  player.mov = false  
+ else
+  anim_player()
+ end
+end
+
+function anim_player()
+ player.step += 1
+ if player.step > 20 then
+  player.step = 1
+  player.f = (player.f)%4 +1
+ end
+ if player.d == "➡️" then 
+ 	player.s = 1 + 12*player.f 
+ end
+ if player.d == "⬅️" then 
+ 	player.s = 1 + 12*player.f
+ end
+ if player.d == "⬆️" then 
+  player.s = 1 + 12*player.f
+ end
+ if player.d == "⬇️" then 
+  player.s = 1 + 12*player.f
+ end
 end
 
 function col_player()
@@ -197,10 +235,16 @@ function draw_game()
 	draw_walls()
 	draw_floor()
 	draw_character()
+	draw_score()
+end
+
+function draw_score()
+ //print("time left: 00:"..time_left,0,0,7)
+ print(player.step..", "..player.f,0,0,7)
 end
 
 function draw_character()
- spr(player.s, player.x, player.y)
+ spr(player.f, player.x, player.y)
  if player.rescuing != nil then
   spr(player.rescuing.s, player.x+4, player.y+4)
  end
@@ -236,11 +280,15 @@ end
 
 -->8
 function update_gameover()
-
+ if btn(🅾️) then
+		mode = "menu"
+	end
 end
 
 function draw_gameover()
-
+cls(1)
+	print("game over!", 30, 50,7)
+	print("press 🅾️ to restart!", 30, 90,7)
 end
 __gfx__
 00000000008888000545545000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
