@@ -100,6 +100,10 @@ function load_player()
  p.ss["⬆️"] = {3,4,3,5}
  p.ss["➡️"] = {6,7,8,9}
  p.ss["⬅️"] = {10,11,12,13}
+ p.ss["⬇️웃"] = {14,15,14,15}
+ p.ss["⬆️웃"] = {14,15,14,15}
+ p.ss["➡️웃"] = {14,15,14,15}
+ p.ss["⬅️웃"] = {14,15,14,15}
  p.dir = "⬇️"
  p.f = 1
  p.mov = 0
@@ -474,15 +478,19 @@ end
 
 function draw_player()
  p = player
- sprite = get_player_sprite()
  coord = get_grid_pos(p.x,p.y)
- spr(sprite, coord.x+p.offsetx, coord.y+p.offsety, p.w, p.h)
  if player.rescuing != nil then
   person = player.rescuing
   coord = get_grid_pos(player.x,player.y)
-  spr(person.s,coord.x+4,coord.y+4,person.w,person.h)
+  spr(person.s,coord.x+p.offsetx,coord.y+p.offsety-person.h*4,person.w,person.h)
   //print(person.name,coord.x,coord.y)
+  sprite = get_player_sprite_resc()
+  spr(sprite,coord.x+p.offsetx, coord.y+p.offsety, p.w, p.h)
+ else
+  sprite = get_player_sprite()
+  spr(sprite, coord.x+p.offsetx, coord.y+p.offsety, p.w, p.h)
  end
+ 
 end
 
 function draw_person(p)
@@ -579,7 +587,17 @@ end
 
 function get_player_sprite(player)
  player = p
+ //if p.rescuing == nil then
  spr_id = p.ss[p.dir][p.f]
+ //else
+ // spr_id = p.ss[p.dir."웃"][p.f]
+ //end
+ return get_sprite(spr_id)
+end
+
+function get_player_sprite_resc(player)
+ player = p
+ spr_id = p.ss["⬇️웃"][p.f]
  return get_sprite(spr_id)
 end
 
