@@ -132,18 +132,13 @@ function load_stairs()
 	 if i > 1 then
    st_d = load_stair_down(st_u)
    f[st_d.x][st_d.y].item=st_d
+   f = clean_fire_around_stairs(f,st_u.x,st_u.y)
   end
 
 	 if i < #floors then
    st_u = load_stair_up()
-   //while f[st_u.x][st_u.y].item != nil do
-   // st_up = load_stair_up()
-   //end
-   f = clean_fire_around_stairs(f,st_u.x,st_u.y)
    f[st_u.x][st_u.y].item=st_u
-   if f[st_u.x][st_u.y+1].item != nil and f[st_u.x][st_u.y+1].item.id == "fire" then
-    f[st_u.x][st_u.y+1].item = nil
-   end
+   f = clean_fire_around_stairs(f,st_u.x,st_u.y)
   end
 	end
 end
@@ -724,13 +719,13 @@ function get_time()
 end
 
 function clean_fire_around_stairs(f,x,y)
- if x+1 < 10 and f[x+1][y].item != nil and f[x+1][y].item.id == "fire" then f[x+1][y].item = nil end
- if y+1 < 9 and f[x][y+1].item != nil and f[x][y+1].item.id == "fire" then f[x][y+1].item = nil end
+ if x+1 < 11 and f[x+1][y].item != nil and f[x+1][y].item.id == "fire" then f[x+1][y].item = nil end
+ if y+1 < 10 and f[x][y+1].item != nil and f[x][y+1].item.id == "fire" then f[x][y+1].item = nil end
  if x-1 > 0 and f[x-1][y].item != nil and f[x-1][y].item.id == "fire" then f[x-1][y].item = nil end
  if y-1 > 0 and f[x][y-1].item != nil and  f[x][y-1].item.id == "fire" then f[x][y-1].item = nil end
- if x+1 < 10 and y+1 < 9 and f[x+1][y+1].item != nil and f[x+1][y+1].item.id == "fire" then f[x+1][y+1].item = nil end
- if x+1 < 10 and y-1 > 0 and f[x+1][y-1].item != nil and f[x+1][y-1].item.id == "fire" then f[x+1][y-1].item = nil end
- if x-1 > 0 and y+1 < 9 and f[x-1][y+1].item != nil and f[x-1][y+1].item.id == "fire" then f[x-1][y+1].item = nil end
+ if x+1 < 11 and y+1 < 10 and f[x+1][y+1].item != nil and f[x+1][y+1].item.id == "fire" then f[x+1][y+1].item = nil end
+ if x+1 < 11 and y-1 > 0 and f[x+1][y-1].item != nil and f[x+1][y-1].item.id == "fire" then f[x+1][y-1].item = nil end
+ if x-1 > 0 and y+1 < 10 and f[x-1][y+1].item != nil and f[x-1][y+1].item.id == "fire" then f[x-1][y+1].item = nil end
  if x-1 > 0 and y-1 > 0 and f[x-1][y-1].item != nil and f[x-1][y-1].item.id == "fire" then f[x-1][y-1].item = nil end
  return f
 end
