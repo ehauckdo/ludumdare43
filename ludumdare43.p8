@@ -84,7 +84,7 @@ end
 
 function load_time()
 	current_time = get_time()
-	time_left = 120
+	time_left = 90
 end
 
 function load_player()
@@ -137,6 +137,9 @@ function load_stairs()
 
 	 if i < #floors then
    st_u = load_stair_up()
+   while inspect_id(f, st_u.x, st_u.y) == "stair" do
+    st_u = load_stair_up()
+   end
    f[st_u.x][st_u.y].item=st_u
    f = clean_fire_around_stairs(f,st_u.x,st_u.y)
   end
@@ -146,14 +149,14 @@ end
 function load_victims()
  total_victims = 0
 	list_victims = {}
-	for i=1,#floors do
+	for i=1, #floors do
 	 f = floors[i]
-	 for j=1, flr(rnd(5))+1 do
+	 for j=1, flr(rnd(3))+1 do
    v = load_person()
    if f[v.x][v.y].item == nil then
 
    	// calculate dist from stair
-   	v.dist = calculate_dist(v,f,i)
+   	v.dist = calculate_dist(v,floors,i)
 
    	f[v.x][v.y].item=v
    	total_victims += 1
@@ -163,57 +166,6 @@ function load_victims()
 	end
 end
 
-//function load_floors()
-// cur_floor = 1
-// total_victims = 0
-// list_victims = {}
-
-// floors = {}
-// top_floor = flr(rnd(3))+5
-// for i=1,top_floor do
-
-//  f = create_matrix(10,9)
-//  add(floors,f)
-//  floors[1][2][9].item = {}
-//  floors[1][2][9].item.id = "safe"
-//  floors[1][3][9].item = {}
-//  floors[1][3][9].item.id = "safe"
-
-//  if i > 1 then
-//   stair_d = load_stair_down(stair)
-//   f[stair_d.x][stair_d.y].item=stair_d
-   //f = clean_fire_around_stairs(f,stair_d.x,stair_d.y)
-//  end
-
-//  if i < top_floor then
-//   stair = load_stair_up()
-//   while f[stair.x][stair.y].item != nil do
-//    stair = load_stair_up()
-    //f = clean_fire_around_stairs(f,stair.x,stair.y)
-//   end
-//   f[stair.x][stair.y].item=stair
-//   if f[stair.x][stair.y+1].item != nil and f[stair.x][stair.y+1].item.id == "fire" then
-//    f[stair.x][stair.y+1].item = nil
-//   end
-//  end
-
-  // creating 1-3 rand people
-//  for j=1, flr(rnd(5))+1 do
-//   person = load_person()
-//   if f[person.x][person.y].item == nil then
-
-   	// calculate dist from stair
-//   	person.dist = calculate_dist(person,floors,i)
-
-//   	f[person.x][person.y].item=person
-//   	total_victims += 1
-//   	add(list_victims, person)
-//   end
-//  end
-
- //end
-
-//end
 
 function load_person()
  local sprites = {192,194,196,198,200}
@@ -221,7 +173,8 @@ function load_person()
  types[1] = {192,194,196,198,200}
  types[2] = {228}
  types[3] = {202,203,204,205,206}
- t = flr(rnd(3))+1
+ //t = flr(rnd(3))+1
+ t = 1
 
  person = {}
  person.t = t
@@ -277,10 +230,15 @@ function calculate_min_rescued()
 	  end
 	 end
 	end
+	//cls()
+	//for i=1,#lv do
+	// print(list_victims[i].dist)
+	//end
+	//stop()
 	minimum = 0
 	local t_left = time_left
 	for p in all(lv) do
-	 t_left -= ceil(p.dist/1.5)
+	 t_left -= flr(p.dist/2) + 2
 	 if t_left >= 0 then
 	  minimum += 1
 	 else break
@@ -326,11 +284,11 @@ function update_player()
   speed = 1
   if p.rescuing != nil then
    if p.rescuing.t == 1 then
-    speed = 0.6
-   elseif p.rescuing.t == 2 then
-    speed = 0.4
-   elseif p.rescuing.t == 3 then
     speed = 0.8
+   elseif p.rescuing.t == 2 then
+    speed = 0.5
+   elseif p.rescuing.t == 3 then
+    speed = 1
    end
   end
 
@@ -422,8 +380,9 @@ function draw_score()
  hours = flr(time_left/60)
  if hours < 10 then hours = "0"..hours end
  print("collapsing in: "..hours..":"..time_left%60,0,0,7)
- print(total_rescued.."/"..total_victims.."웃",100,0,7)
+ //print(total_rescued.."/"..total_victims.."웃",100,0,7)
  //print(total_rescued.."/"..total_victims.."/"..minimum.."웃",100,0,7)
+ print(total_rescued.."/"..minimum.."웃",100,0,7)
 end
 
 function draw_floor()
@@ -522,14 +481,25 @@ function draw_walls()
 	if cur_floor == 1 then spr(98,20,124,1.5,1.5) spr(98,32,124,1.5,1.5) end
 end
 -->8
+aaaa = 0
+bbbb = 1
+
 function victory_gameover()
  mode = "gameover"
  victory = true
+ initialize_dead_toll()
 end
 
 function loss_gameover()
  mode = "gameover"
  victory = false
+ initialize_dead_toll()
+end
+
+function initialize_dead_toll()
+ dead = count_item(floors,"person")
+ y_coord = 37 - #dead * 8
+ list_step = 0
 end
 
 function update_gameover()
@@ -544,29 +514,52 @@ function draw_gameover()
 	rectfill(0,60,127,63,10)
 	rectfill(0,65,127,68,10)
 	rectfill(12,0,115,128,2)
+ 
+	rectfill(18,44,109,115,0)
+	draw_dead()
+ if list_step > 10 then
+  list_step = 0
+  y_coord += 1
+  if y_coord >= 104 then
+  	y_coord = 37 - #dead * 8
+  end 
+ end
+ 
+ rectfill(12,0,115,36,2)
+ 
+ rectfill(18,36,109,52,0)
+ print("death toll: "..#dead,38,42,7)
+ 
+ rectfill(12,107,115,128,2)
+	
  if victory == true then
- 	print("congratulations!", 34,28,7)
- 	print(" you rescued the majority!", 15,36,7)
-  print("press 🅾️ to restart", 30, 48,7)
+ 	print("congratulations!", 34,15,7)
+ 	print(" you rescued the majority!", 11,24,7)
+  print("press 🅾️ to restart", 30, 115,7)
  else
-  print("game over",45,15,7)
-  print("press 🅾️ to restart", 28, 25,7)
+  print("game over! ",45,24,7)
+  print("press 🅾️ to restart", 28, 115,7)
  end
 
- dead = count_item(floors,"person")
- if #dead > 0 then
-  print("death toll: "..#dead,38,45,7)
-  y_coord = 53
-  for p in all(dead) do
-   //print(p.name,38,y_coord,7)
-   print(p.name,64-#p.name*2,y_coord,7)
-   y_coord += 8
-  end
-
- end
+ //dead = count_item(floors,"person")
+ 
 
 end
 
+function draw_dead()
+ list_step += 2
+ 
+ //dead = count_item(floors,"person")
+ if #dead > 0 then
+  print("death toll: "..#dead,38,45,7)
+  cur_coord = y_coord
+  for p in all(dead) do
+   print(p.name,64-#p.name*2,cur_coord,7)
+   cur_coord += 8
+  end
+
+ end
+end
 -->8
 function sprite(x,y,h,w,s)
  local sprite = {}
@@ -672,11 +665,21 @@ function calculate_dist(p, fl,c_fl)
 	local dist = 0
 	local last_x = p.x
 	local last_y = p.y
+
 	for f=c_fl,1,-1 do
+	 
 	 local cur_floor = fl[f]
+	 
 	 for i=1,#cur_floor do
+	  
+	  //print(cur_floor[i])
+	  //for k,v in pairs(cur_floor[i]) do
+  	//	print(k.." = "..v)
+			//end
+	  //stop()
 	  for j=1,#cur_floor[i] do
 	  	id = inspect_id(cur_floor,i,j)
+	  	
 	  	if id == "stair" and  cur_floor[i][j].item.dir == "⬇️" then
 	  	 dist += abs(last_x-i)+abs(last_y-j)
 	  	 last_x = i
@@ -684,6 +687,7 @@ function calculate_dist(p, fl,c_fl)
 	  	end
 	  	if id == "safe" then
 	  	 dist += abs(last_x-i)+abs(last_y-j)
+	  	 return dist
 	  	end
 	  end
 	 end
@@ -733,14 +737,14 @@ end
 names ={}
 surnames = {}
 add(names, "john")
-add(names, "zachariah")
+add(names, "elliot")
 add(names, "nicholas")
 add(names, "jimothy")
 add(names, "alexander")
 add(names, "remus")
 add(names, "sephiroth")
 add(names, "jeff")
-add(names, "aziraphale")
+add(names, "martin")
 add(names, "luke")
 add(names, "grant")
 add(names, "mads")
@@ -750,8 +754,8 @@ add(names, "callum")
 add(names, "heather")
 add(names, "eilish")
 add(names, "deirdre")
-add(names, "hamble-rose")
-add(names, "galadriel")
+add(names, "rose")
+add(names, "jordan")
 add(names, "faye")
 add(names, "iona")
 add(names, "kumiko")
@@ -767,7 +771,7 @@ add(surnames, "reid")
 add(surnames, "scholten")
 add(surnames, "argent")
 add(surnames, "welsh")
-add(surnames, "carr-wilson")
+add(surnames, "wilson")
 add(surnames, "browne")
 add(surnames, "falconer")
 add(surnames, "smith")
@@ -775,7 +779,7 @@ add(surnames, "garner")
 add(surnames, "briscoe")
 add(surnames, "stilisnki")
 add(surnames, "mcbrearty")
-add(surnames, "richardson")
+add(surnames, "saunders")
 add(surnames, "blandy")
 add(surnames, "evans")
 add(surnames, "maclean")
