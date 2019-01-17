@@ -264,7 +264,7 @@ function update_time()
   current_time = get_time()
   time_left = time_left - 1
   if time_left == 0 then
-  	if total_rescued >= total_victims/2 then
+  	if total_rescued >= minimum then
   	 victory_gameover()
   	else
   	 loss_gameover()
@@ -498,6 +498,9 @@ end
 
 function initialize_dead_toll()
  dead = count_item(floors,"person")
+ if p.rescuing != nil then
+ 	add(dead, p.rescuing)
+ end
  y_coord = 37 - #dead * 8
  list_step = 0
 end
