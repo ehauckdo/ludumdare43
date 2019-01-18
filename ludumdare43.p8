@@ -173,8 +173,7 @@ function load_person()
  types[1] = {192,194,196,198,200}
  types[2] = {228}
  types[3] = {202,203,204,205,206}
- //t = flr(rnd(3))+1
- t = 1
+ t = flr(rnd(3))+1
 
  person = {}
  person.t = t
@@ -690,6 +689,7 @@ function calculate_dist(p, fl,c_fl)
 	  	end
 	  	if id == "safe" then
 	  	 dist += abs(last_x-i)+abs(last_y-j)
+	  	 
 	  	 return dist
 	  	end
 	  end
