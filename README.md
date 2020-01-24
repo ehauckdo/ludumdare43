@@ -32,7 +32,9 @@ Unfortunately, a lot of things were not implemented due to time limitations (spe
 
 The main lessons to take away are aiming at making good use of the mechanics and creating more complete experience for game.
 
+#### License
 
+Licensed under the [MIT License](LICENSE).
 
 
 
